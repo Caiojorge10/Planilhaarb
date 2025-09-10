@@ -61,24 +61,68 @@ Um sistema completo para gerenciar arbitragens esportivas, freebets e extraçõe
 
 1. **Clone o repositório**
 ```bash
-git clone [url-do-repositorio]
-cd arbitragem-esportiva
+git clone https://github.com/seu-usuario/seu-repo.git
+cd "Planilha arbitragem"
 ```
 
 2. **Instale as dependências**
+### Frontend
 ```bash
 npm install
 ```
+### Backend
+```bash
+cd backend
+npm install
+```
 
-3. **Execute em modo desenvolvimento**
+3. **Configure variáveis de ambiente**
+Crie um arquivo `.env` na raiz do backend (exemplo):
+```
+JWT_SECRET=sua_senha_secreta
+```
+
+4. **Rodar as migrations e preparar o banco**
+```bash
+cd backend
+npx prisma migrate dev --name init
+```
+
+5. **Iniciar o backend**
+```bash
+cd backend
+npm run dev
+```
+O backend ficará disponível em `http://localhost:3000/api`
+
+6. **Iniciar o frontend**
+Abra outro terminal na raiz do projeto:
 ```bash
 npm run dev
 ```
+O frontend ficará disponível em `http://localhost:3000`
 
-4. **Acesse o projeto**
-```
-http://localhost:3000
-```
+7. **Acessar o sistema**
+Abra o navegador e acesse: [http://localhost:3000](http://localhost:3000)
+
+- Faça seu cadastro e login.
+- Todas as operações são individuais por usuário.
+
+8. **Dicas de uso**
+- Utilize as páginas do menu lateral para cadastrar casas, arbitragens, freebets, movimentações, etc.
+- Os relatórios mostram apenas os dados do usuário logado.
+- Para visualizar o banco de dados, use o Prisma Studio:
+  ```bash
+  cd backend
+  npx prisma studio
+  ```
+
+9. **Observações**
+- O banco de dados padrão é SQLite local (arquivo `backend/prisma/dev.db`).
+- Para produção, recomenda-se usar um banco mais robusto e variáveis de ambiente seguras.
+
+---
+Dúvidas? Abra uma issue ou entre em contato!
 
 ## 🏗️ Estrutura do Projeto
 

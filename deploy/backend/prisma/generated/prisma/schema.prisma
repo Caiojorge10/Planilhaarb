@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id            Int            @id @default(autoincrement())
+  nome          String
+  email         String         @unique
+  senha         String
+  casas         Casa[]
+  arbitragens   Arbitragem[]
+  freebets      Freebet[]
+  movimentacoes Movimentacao[]
+  freeSpins     FreeSpin[]
+}
+
+model Casa {
+  id               Int            @id @default(autoincrement())
+  nome             String
+  pais             String
+  licenca          String?
+  avaliacao        Float?
+  status           String         @default("ativa")
+  bonusBoasVindas  String?
+  bonusRecarga     String?
+  tempoSaque       String?
+  metodosPagamento String?
+  telefone         String?
+  email            String?
+  site             String?
+  observacoes      String?
+  arbitragens1     Arbitragem[]   @relation("Casa1")
+  arbitragens2     Arbitragem[]   @relation("Casa2")
+  arbitragens3     Arbitragem[]   @relation("Casa3")
+  arbitragens4     Arbitragem[]   @relation("Casa4")
+  freebets         Freebet[]
+  movimentacoes    Movimentacao[]
+  freeSpins        FreeSpin[]
+  usuario          Usuario        @relation(fields: [usuarioId], references: [id])
+  usuarioId        Int
+}
+
+model Arbitragem {
+  id      Int    @id @default(autoincrement())
+  evento  String
+  esporte String
+  tipo    String @default("2_resultados") // "2_resultados", "3_resultados", "4_resultados"
+
+  // Casa 1
+  casa1      Casa   @relation("Casa1", fields: [casa1Id], references: [id])
+  casa1Id    Int
+  odd1       Float
+  stake1     Float
+  resultado1 String // "Vitória Time 1", "Empate", "2-0", etc.
+
+  // Casa 2
+  casa2      Casa   @relation("Casa2", fields: [casa2Id], references: [id])
+  casa2Id    Int
+  odd2       Float
+  stake2     Float
+  resultado2 String
+
+  // Casa 3 (opcional)
+  casa3      Casa?   @relation("Casa3", fields: [casa3Id], references: [id])
+  casa3Id    Int?
+  odd3       Float?
+  stake3     Float?
+  resultado3 String?
+
+  // Casa 4 (opcional)
+  casa4      Casa?   @relation("Casa4", fields: [casa4Id], references: [id])
+  casa4Id    Int?
+  odd4       Float?
+  stake4     Float?
+  resultado4 String?
+
+  valorTotalInvestir Float
+
+  lucroEsperado Float
+  status        String   @default("identificada")
+  ladoVencedor  String? // 'casa1', 'casa2', 'casa3', 'casa4' ou null
+  data          DateTime @default(now())
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int
+}
+
+model Freebet {
+  id            Int      @id @default(autoincrement())
+  casa          Casa     @relation(fields: [casaId], references: [id])
+  casaId        Int
+  valor         Float
+  tipo          String
+  status        String   @default("ativo")
+  dataObtencao  DateTime
+  dataExpiracao DateTime
+  valorExtraido Float?
+  estrategia    String?
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int
+}
+
+model Movimentacao {
+  id         Int      @id @default(autoincrement())
+  casa       Casa     @relation(fields: [casaId], references: [id])
+  casaId     Int
+  tipo       String // 'deposito', 'saque', 'aposta' ou 'premio'
+  valor      Float
+  data       DateTime @default(now())
+  observacao String?
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int
+}
+
+model FreeSpin {
+  id         Int      @id @default(autoincrement())
+  casa       Casa     @relation(fields: [casaId], references: [id])
+  casaId     Int
+  valorGanho Float
+  data       DateTime @default(now())
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int
+}

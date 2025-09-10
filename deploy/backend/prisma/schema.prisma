@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id            Int            @id @default(autoincrement())
+  nome          String
+  email         String         @unique
+  senha         String
+  arbitragens   Arbitragem[]
+  casas         Casa[]
+  freeSpins     FreeSpin[]
+  freebets      Freebet[]
+  ganhos        Ganho[]
+  movimentacoes Movimentacao[]
+  percas        Perca[]
+}
+
+model Casa {
+  id               Int            @id @default(autoincrement())
+  nome             String
+  pais             String
+  licenca          String?
+  avaliacao        Float?
+  status           String         @default("ativa")
+  bonusBoasVindas  String?
+  bonusRecarga     String?
+  tempoSaque       String?
+  metodosPagamento String?
+  telefone         String?
+  email            String?
+  site             String?
+  observacoes      String?
+  usuarioId        Int
+  arbitragens5     Arbitragem[]   @relation("Casa5")
+  arbitragens4     Arbitragem[]   @relation("Casa4")
+  arbitragens3     Arbitragem[]   @relation("Casa3")
+  arbitragens2     Arbitragem[]   @relation("Casa2")
+  arbitragens1     Arbitragem[]   @relation("Casa1")
+  usuario          Usuario        @relation(fields: [usuarioId], references: [id])
+  freeSpins        FreeSpin[]
+  freebets         Freebet[]
+  ganhos           Ganho[]
+  movimentacoes    Movimentacao[]
+  percas           Perca[]
+}
+
+model Arbitragem {
+  id                 Int      @id @default(autoincrement())
+  evento             String
+  esporte            String
+  tipo               String   @default("2_resultados")
+  casa1Id            Int
+  odd1               Float
+  stake1             Float
+  resultado1         String
+  freebet1           Boolean? @default(false)
+  casa2Id            Int
+  odd2               Float
+  stake2             Float
+  resultado2         String
+  freebet2           Boolean? @default(false)
+  casa3Id            Int?
+  odd3               Float?
+  stake3             Float?
+  resultado3         String?
+  freebet3           Boolean? @default(false)
+  casa4Id            Int?
+  odd4               Float?
+  stake4             Float?
+  resultado4         String?
+  freebet4           Boolean? @default(false)
+  casa5Id            Int?
+  odd5               Float?
+  stake5             Float?
+  resultado5         String?
+  freebet5           Boolean? @default(false)
+  valorTotalInvestir Float
+  lucroEsperado      Float
+  status             String   @default("identificada")
+  ladoVencedor       String?
+  data               DateTime @default(now())
+  usuarioId          Int
+  usuario            Usuario  @relation(fields: [usuarioId], references: [id])
+  casa5              Casa?    @relation("Casa5", fields: [casa5Id], references: [id])
+  casa4              Casa?    @relation("Casa4", fields: [casa4Id], references: [id])
+  casa3              Casa?    @relation("Casa3", fields: [casa3Id], references: [id])
+  casa2              Casa     @relation("Casa2", fields: [casa2Id], references: [id])
+  casa1              Casa     @relation("Casa1", fields: [casa1Id], references: [id])
+}
+
+model Freebet {
+  id            Int      @id @default(autoincrement())
+  casaId        Int
+  valor         Float
+  tipo          String
+  status        String   @default("ativo")
+  dataObtencao  DateTime
+  dataExpiracao DateTime
+  valorExtraido Float?
+  estrategia    String?
+  usuarioId     Int
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id])
+  casa          Casa     @relation(fields: [casaId], references: [id])
+}
+
+model Movimentacao {
+  id           Int      @id @default(autoincrement())
+  casaId       Int
+  tipo         String
+  valor        Float
+  data         DateTime @default(now())
+  observacao   String?
+  usuarioId    Int
+  percaId      Int?     @unique
+  arbitragemId Int?
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id])
+  casa         Casa     @relation(fields: [casaId], references: [id])
+  perca        Perca?   @relation(fields: [percaId], references: [id], onDelete: Cascade)
+}
+
+model FreeSpin {
+  id         Int      @id @default(autoincrement())
+  casaId     Int
+  valorGanho Float
+  data       DateTime @default(now())
+  usuarioId  Int
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  casa       Casa     @relation(fields: [casaId], references: [id])
+}
+
+model Perca {
+  id           Int           @id @default(autoincrement())
+  casaId       Int
+  valor        Float
+  data         DateTime      @default(now())
+  usuarioId    Int
+  usuario      Usuario       @relation(fields: [usuarioId], references: [id])
+  casa         Casa          @relation(fields: [casaId], references: [id])
+  movimentacao Movimentacao?
+}
+
+model Ganho {
+  id        Int      @id @default(autoincrement())
+  casaId    Int
+  valor     Float
+  data      DateTime @default(now())
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  casa      Casa     @relation(fields: [casaId], references: [id])
+}
